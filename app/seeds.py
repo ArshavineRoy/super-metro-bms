@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     matatus = []
     for route in all_routes:
-        for _ in range(random.randint(0, 10)):  # Generate between 0 and 10 matatus per route
+        for _ in range(random.randint(20, 40)):  # Generate between 0 and 10 matatus per route
             member = random.choice(members)  # Choose a random member in the list
             route = random.choice(all_routes)  # Choose a random route in the list
 
@@ -67,6 +67,7 @@ if __name__ == "__main__":
             matatu = Matatu(
                 number_plate=plates,
                 capacity=random.choice([40, 50]),
+                avg_rounds_pd=random.choice([9, 10, 11, 12, 13, 14, 15, 16]),
                 member_id=member.id,  # Set the member_id for the matatu
                 route_id=route.id,  # Set the route_id for the matatu
             )
