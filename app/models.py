@@ -55,6 +55,7 @@ class Matatu(Base):
     id = Column(Integer(), primary_key=True)
     number_plate = Column(String())
     capacity = Column(Integer())
+    avg_rounds_pd = Column(Integer())
     member_id = Column(Integer())
     route_id = Column(Integer())    
 
@@ -71,6 +72,7 @@ class Matatu(Base):
         return f'Matatu(id={self.id}, ' + \
             f'number_plate={self.number_plate}, ' + \
             f'capacity={self.capacity}, ' + \
+            f'avg_rounds_pd={self.avg_rounds_pd}, ' + \
             f'member_id={self.member_id}, ' + \
             f'route_id={self.route_id})'
     
