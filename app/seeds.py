@@ -65,6 +65,8 @@ if __name__ == "__main__":
             plates= fake.numerify(text=f'K{sec}{letter} ###{letter}') # Generate random, realistic Kenyan number plates
                 
             matatu = Matatu(
+                driver_name = fake.name(),
+                driver_contact = int(fake.numerify(text='+2547#########')),
                 number_plate=plates,
                 capacity=random.choice([40, 50]),
                 avg_rounds_pd=random.choice([9, 10, 11, 12, 13, 14, 15, 16]),

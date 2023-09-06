@@ -53,6 +53,8 @@ class Matatu(Base):
     __tablename__ = 'matatus'
 
     id = Column(Integer(), primary_key=True)
+    driver_name = Column(String())
+    driver_contact = Column(Integer())
     number_plate = Column(String())
     capacity = Column(Integer())
     avg_rounds_pd = Column(Integer())
@@ -70,6 +72,8 @@ class Matatu(Base):
 
     def __repr__(self):
         return f'Matatu(id={self.id}, ' + \
+            f'driver_name={self.driver_name}, ' + \
+            f'driver_contact={self.driver_contact}, ' + \
             f'number_plate={self.number_plate}, ' + \
             f'capacity={self.capacity}, ' + \
             f'avg_rounds_pd={self.avg_rounds_pd}, ' + \
