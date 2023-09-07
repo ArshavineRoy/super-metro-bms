@@ -296,7 +296,18 @@ def owner_of_matatu(number_plate):
         click.echo(f"{owner}\n")
     else:
         click.echo(error(f"No matatu found with number plate: {number_plate} \n"))
-    
+
+@click.command()
+@click.option('--route_id', prompt='Route Id', help='Id of the route to search.', callback=route_id_exists)
+def matatus_on_route(route_id):
+    """Find all matatus plying this route."""
+
+    if route_id:
+        all_matatus = session.query(Matatu).filter(Matatu.route_id == route_id).all()
+
+        click.echo(f"{all_matatus}\n")
+    else:
+        click.echo(error(f"Route id not found. \n"))
 
 
 
@@ -312,8 +323,7 @@ my_commands.add_command(delete_member)
 my_commands.add_command(delete_route)
 my_commands.add_command(delete_matatu)
 my_commands.add_command(owner_of_matatu)
-
-
+my_commands.add_command(matatus_on_route)
 
 
 
