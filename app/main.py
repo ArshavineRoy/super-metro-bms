@@ -204,7 +204,7 @@ def add_matatu(owner, route, driver_name, driver_contact, number_plate, capacity
 @click.command()
 @click.option('--name', prompt='Name', help='Name of the member to search for')
 def find_member_by_name(name):
-    """Search for a member by name."""
+    """Find a member by name."""
     member = session.query(Member).filter(Member.name == name).first()
 
     if member:
@@ -216,7 +216,7 @@ def find_member_by_name(name):
 @click.command()
 @click.option('--name', prompt='Name', help='Name of the route to search for')
 def find_route_by_name(name):
-    """Search for a route by name."""
+    """Find a route by name."""
     route = session.query(Route).filter(Route.name == name).first()
 
     if route:
@@ -229,7 +229,7 @@ def find_route_by_name(name):
 @click.command()
 @click.option('--number_plate', prompt='Number plate', help='Number plate of the matatu to search for')
 def find_matatu_by_number_plate(number_plate):
-    """Search for a matatu by number_plate."""
+    """Find a matatu by number plate."""
     matatu = session.query(Matatu).filter(Matatu.number_plate == number_plate).first()
 
     if matatu:
@@ -240,7 +240,7 @@ def find_matatu_by_number_plate(number_plate):
 @click.command()
 @click.option('--driver_name', prompt='Driver name', help='Driver name of the matatu to search for')
 def find_matatu_by_driver_name(driver_name):
-    """Search for a matatu by driver_name."""
+    """Find a matatu by driver name."""
     matatu = session.query(Matatu).filter(Matatu.driver_name == driver_name).first()
 
     if matatu:
@@ -283,6 +283,22 @@ def delete_matatu(id):
 
     click.echo(green(f"Matatu id {id} deleted successfully! \n"))
 
+# matatu owner
+@click.command()
+@click.option('--number_plate', prompt='Number plate', help='Number plate of the matatu to search for', callback=validate_number_plate)
+def owner_of_matatu(number_plate):
+    """Find the owner of a matatu by number plate"""
+    matatu = session.query(Matatu).filter(Matatu.number_plate == number_plate).first()
+
+    if matatu:
+        id = matatu.member_id
+        owner = session.query(Member).filter(Member.id == id).first()
+        click.echo(f"{owner}\n")
+    else:
+        click.echo(error(f"No matatu found with number plate: {number_plate} \n"))
+    
+
+
 
 # Add commands to the group
 my_commands.add_command(add_member)
@@ -295,6 +311,8 @@ my_commands.add_command(find_matatu_by_driver_name)
 my_commands.add_command(delete_member)
 my_commands.add_command(delete_route)
 my_commands.add_command(delete_matatu)
+my_commands.add_command(owner_of_matatu)
+
 
 
 
