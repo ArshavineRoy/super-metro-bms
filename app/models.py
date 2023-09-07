@@ -1,7 +1,7 @@
 from sqlalchemy import ForeignKey, Column, Integer, String, DateTime, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.associationproxy import association_proxy
-from app.db import Base, session
+from db import Base, session
 
 
 class Member(Base):

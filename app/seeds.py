@@ -44,7 +44,7 @@ if __name__ == "__main__":
     for i in range(60):  # Generate 90 fake members
         member = Member(
             name =fake.name(),
-            phone = int(fake.numerify(text='+2547#########')), # Generate random, realistic Kenyan phone numbers
+            phone = int(fake.numerify(text='+2547########')), # Generate random, realistic Kenyan phone numbers
             national_id = int(fake.numerify(text=f'{random.randint(1, 4)}#######')), # Generate random, realistic Kenyan ID numbers
             location = random.choice(['Nairobi', 'Thika', 'Mombasa', 'Kisumu', 'Nakuru', 'Juja', 'Machakos'])            
         )
