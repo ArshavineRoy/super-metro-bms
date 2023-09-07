@@ -1,7 +1,7 @@
 from sqlalchemy import ForeignKey, Column, Integer, String, DateTime, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.associationproxy import association_proxy
-from db import Base, session
+from app.db import Base, session
 
 
 class Member(Base):
@@ -80,8 +80,3 @@ class Matatu(Base):
             f'avg_rounds_pd={self.avg_rounds_pd}, ' + \
             f'member_id={self.member_id}, ' + \
             f'route_id={self.route_id})'
-    
-# komatsu = Matatu(number_plate='KDM 245R', capacity=41, member_id=23, route_id=105)
-
-komatsu = session.query(Matatu).first()
-print(komatsu)
