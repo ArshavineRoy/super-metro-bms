@@ -224,7 +224,31 @@ def find_route_by_name(name):
     else:
         click.echo(error(f"No route found with the name: {name} \n"))
 
-# delete member
+
+# search matatus
+@click.command()
+@click.option('--number_plate', prompt='Number plate', help='Number plate of the matatu to search for')
+def find_matatu_by_number_plate(number_plate):
+    """Search for a matatu by number_plate."""
+    matatu = session.query(Matatu).filter(Matatu.number_plate == number_plate).first()
+
+    if matatu:
+        click.echo(f"{matatu}\n")
+    else:
+        click.echo(error(f"No matatu found with number plate: {number_plate} \n"))
+
+@click.command()
+@click.option('--driver_name', prompt='Driver name', help='Driver name of the matatu to search for')
+def find_matatu_by_driver_name(driver_name):
+    """Search for a matatu by driver_name."""
+    matatu = session.query(Matatu).filter(Matatu.driver_name == driver_name).first()
+
+    if matatu:
+        click.echo(f"{matatu}\n")
+    else:
+        click.echo(error(f"No matatu found with driver name: {driver_name} \n"))
+
+# delete member 
 
 @click.command()
 @click.option('--id', prompt='Member Id', help='Id of the member to delete. This is not the national id.', callback=member_id_exists)
@@ -266,10 +290,11 @@ my_commands.add_command(add_route)
 my_commands.add_command(add_matatu)
 my_commands.add_command(find_member_by_name)
 my_commands.add_command(find_route_by_name)
+my_commands.add_command(find_matatu_by_number_plate)
+my_commands.add_command(find_matatu_by_driver_name)
 my_commands.add_command(delete_member)
 my_commands.add_command(delete_route)
 my_commands.add_command(delete_matatu)
-
 
 
 
