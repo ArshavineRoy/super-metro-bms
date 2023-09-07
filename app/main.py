@@ -126,6 +126,20 @@ def member_id_exists(ctx, param, value):
     
     return value
 
+def route_id_exists(ctx, param, value):
+    id = session.query(Route).filter(Route.id == value).first()
+    if not id:
+        raise click.BadParameter(error('id does not exist.'))
+    
+    return value 
+
+def matatu_id_exists(ctx, param, value):
+    id = session.query(Matatu).filter(Matatu.id == value).first()
+    if not id:
+        raise click.BadParameter(error('id does not exist.'))
+    
+    return value 
+
 # LOGIC
 
 # Add a new member to the database.
@@ -222,7 +236,28 @@ def delete_member(id):
 
     click.echo(green(f"Member deleted successfully! \n"))
 
+# delete route
+@click.command()
+@click.option('--id', prompt='Route Id', help='Id of the route to delete.', callback=route_id_exists)
+def delete_route(id):
+    """Delete a route by id."""
 
+    session.query(Route).filter(Route.id == id).delete()
+    session.commit()
+
+    click.echo(green(f"Route deleted successfully! \n"))
+
+
+# delete matatu
+@click.command()
+@click.option('--id', prompt='Route Id', help='Id of the matatu to delete.', callback=matatu_id_exists)
+def delete_matatu(id):
+    """Delete a matatu by id."""
+
+    session.query(Matatu).filter(Matatu.id == id).delete()
+    session.commit()
+
+    click.echo(green(f"Matatu id {id} deleted successfully! \n"))
 
 
 # Add commands to the group
@@ -232,6 +267,9 @@ my_commands.add_command(add_matatu)
 my_commands.add_command(find_member_by_name)
 my_commands.add_command(find_route_by_name)
 my_commands.add_command(delete_member)
+my_commands.add_command(delete_route)
+my_commands.add_command(delete_matatu)
+
 
 
 
