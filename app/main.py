@@ -1,10 +1,14 @@
 from db import Base, engine, session
 from models import Member, Route, Matatu
-from colorama import init, Fore, Back, Style
+from colorama import init, Fore, Style
 import click
 import re
 
 init()
+
+@click.group()
+def my_commands():
+    pass
 
 rd = Fore.RED
 bl = Fore.BLUE
@@ -20,14 +24,27 @@ fr = Fore.RESET
 smbms= '< SUPER METRO BUS MANAGEMENT SYSTEM >'
 print(cyan + br + f'\n{smbms:-^50}\n')
 
-@click.group()
-def my_commands():
-    pass
-
-# VALIDATORS
 
 def error(message):
     return f"{rd}{message}{cyan}"
+
+def blue(message):
+    return f"{bl}{message}{cyan}\n"
+
+def green(message):
+    return f"{gr}{message}{cyan}\n"
+
+def magenta(message):
+    return f"{mg}{message}{cyan}\n"
+
+def white(message):
+    return f"{wh}{message}{cyan}\n"
+
+def yellow(message):
+    return f"{yl}{message}{cyan}\n"
+
+
+# VALIDATORS
 
 def validate_id(ctx, param, value):
     if not value.isdigit() or len(value) != 8:
@@ -194,8 +211,6 @@ my_commands.add_command(add_route)
 my_commands.add_command(add_matatu)
 my_commands.add_command(find_member_by_name)
 my_commands.add_command(find_route_by_name)
-
-
 
 
 
