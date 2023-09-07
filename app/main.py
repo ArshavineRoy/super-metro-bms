@@ -336,13 +336,13 @@ def matatus_on_route(route_id):
         click.echo(error(f"Route id not found. \n"))
 '''
 
-# Generates a CSV file
+# Generates a CSV file with all matatus plying a certain route
 
 @click.command()
 @click.option('--route_id', prompt='Route Id', help='Id of the route to search.', callback=route_id_exists)
 @click.option('--filename', prompt='Output Filename', help='Name of the output .csv file.')
 def matatus_on_route(route_id, filename):
-    """Find all matatus plying this route."""
+    """Find all matatus plying this route (.csv)"""
     
     if route_id:
         all_matatus = session.query(Matatu).filter(Matatu.route_id == route_id).all()
@@ -374,6 +374,22 @@ def matatus_on_route(route_id, filename):
     else:
         click.echo(error("Route id not found.\n"))
 
+# All matatus owned by a member
+@click.command()
+@click.option('--name', prompt='Name', help='Name of the member to search for', callback=member_exists)
+def matatus_owned_by(name):
+    """All matatus owned by a member."""
+
+    member = session.query(Member).filter(Member.name == name).first()
+
+    if member:
+        matatus = session.query(Matatu).filter(Matatu.member_id == member.id).all()
+
+        click.echo(f"{matatus}\n")
+    else:
+        click.echo(error(f"No matatus found for {name} \n"))
+
+
 
 # Add commands to the group
 my_commands.add_command(add_member)
@@ -388,7 +404,7 @@ my_commands.add_command(delete_route)
 my_commands.add_command(delete_matatu)
 my_commands.add_command(owner_of_matatu)
 my_commands.add_command(matatus_on_route)
-
+my_commands.add_command(matatus_owned_by)
 
 
 if __name__ == '__main__':
