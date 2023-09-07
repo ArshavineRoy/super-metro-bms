@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.ext.associationproxy import association_proxy
 from db import Base, session
 
+
 class Member(Base):
     __tablename__ = 'members'
 
@@ -80,3 +81,7 @@ class Matatu(Base):
             f'member_id={self.member_id}, ' + \
             f'route_id={self.route_id})'
     
+# komatsu = Matatu(number_plate='KDM 245R', capacity=41, member_id=23, route_id=105)
+
+komatsu = session.query(Matatu).first()
+print(komatsu)
