@@ -105,17 +105,24 @@ def validate_double_int(ctx, param, value):
     
     return value
 
-def owner_exists(ctx, param, value):
+def member_exists(ctx, param, value):
     member = session.query(Member).filter(Member.name == value).first()
     if not member:
-        raise click.BadParameter(error('The owner must be an existing member.'))
+        raise click.BadParameter(error('This must be an existing member.'))
     
     return value
 
 def route_exists(ctx, param, value):
     member = session.query(Route).filter(Route.name == value).first()
     if not member:
-        raise click.BadParameter(error('The owner must be an existing member.'))
+        raise click.BadParameter(error('This must be an existing route.'))
+    
+    return value
+
+def member_id_exists(ctx, param, value):
+    id = session.query(Member).filter(Member.id == value).first()
+    if not id:
+        raise click.BadParameter(error('id does not exist. Note that this is not the national id.'))
     
     return value
 
@@ -154,7 +161,7 @@ def add_route(name, price):
 
 # Add a new matatu to the fleet.
 @click.command()
-@click.option('--owner', prompt='Owner Full Name', help='Owner name - must be an existing member', callback=owner_exists)
+@click.option('--owner', prompt='Owner Full Name', help='Owner name - must be an existing member', callback=member_exists)
 @click.option('--route', prompt='Route Name', help='Route name - must be an existing member', callback=route_exists)
 @click.option('--driver-name', prompt='Driver Full Name', help='Driver name', callback=validate_name)
 @click.option('--driver-contact', prompt="Driver's Contact", help='Phone number starting with with 254', callback=validate_phone)
@@ -203,6 +210,19 @@ def find_route_by_name(name):
     else:
         click.echo(error(f"No route found with the name: {name} \n"))
 
+# delete member
+
+@click.command()
+@click.option('--id', prompt='Member Id', help='Id of the member to delete. This is not the national id.', callback=member_id_exists)
+def delete_member(id):
+    """Delete a member by id."""
+
+    session.query(Member).filter(Member.id == id).delete()
+    session.commit()
+
+    click.echo(green(f"Member deleted successfully! \n"))
+
+
 
 
 # Add commands to the group
@@ -211,6 +231,8 @@ my_commands.add_command(add_route)
 my_commands.add_command(add_matatu)
 my_commands.add_command(find_member_by_name)
 my_commands.add_command(find_route_by_name)
+my_commands.add_command(delete_member)
+
 
 
 
