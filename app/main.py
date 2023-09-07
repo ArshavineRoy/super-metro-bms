@@ -88,6 +88,19 @@ def validate_double_int(ctx, param, value):
     
     return value
 
+def owner_exists(ctx, param, value):
+    member = session.query(Member).filter(Member.name == value).first()
+    if not member:
+        raise click.BadParameter(error('The owner must be an existing member.'))
+    
+    return value
+
+def route_exists(ctx, param, value):
+    member = session.query(Route).filter(Route.name == value).first()
+    if not member:
+        raise click.BadParameter(error('The owner must be an existing member.'))
+    
+    return value
 
 # LOGIC
 
@@ -124,13 +137,15 @@ def add_route(name, price):
 
 # Add a new matatu to the fleet.
 @click.command()
+@click.option('--owner', prompt='Owner Full Name', help='Owner name - must be an existing member', callback=owner_exists)
+@click.option('--route', prompt='Route Name', help='Route name - must be an existing member', callback=route_exists)
 @click.option('--driver-name', prompt='Driver Full Name', help='Driver name', callback=validate_name)
 @click.option('--driver-contact', prompt="Driver's Contact", help='Phone number starting with with 254', callback=validate_phone)
 @click.option('--number-plate', prompt='Number Plate', help='Matatu number plate', callback=validate_number_plate)
 @click.option('--capacity', prompt='Capacity', help='Matatu capacity', callback=validate_double_int)
 @click.option('--avg-rounds-pd', prompt='Average Rounds Per Day', help='Average rounds per day', callback=validate_double_int)
 
-def add_matatu(driver_name, driver_contact, number_plate, capacity, avg_rounds_pd):
+def add_matatu(owner, route, driver_name, driver_contact, number_plate, capacity, avg_rounds_pd):
     """Add a new matatu to the fleet. Must be owned by an existing member."""
     new_matatu = Matatu(
         number_plate=number_plate,
@@ -138,8 +153,8 @@ def add_matatu(driver_name, driver_contact, number_plate, capacity, avg_rounds_p
         driver_name=driver_name,
         driver_contact=driver_contact,
         avg_rounds_pd=avg_rounds_pd,
-        # route_id=route_id,
-        # member_id=member_id,
+        route_id=session.query(Route).filter(Route.name == route).first().id,
+        member_id=session.query(Member).filter(Member.name == owner).first().id,
     )
 
     session.add(new_matatu)
@@ -150,21 +165,36 @@ def add_matatu(driver_name, driver_contact, number_plate, capacity, avg_rounds_p
 # search members
 @click.command()
 @click.option('--name', prompt='Name', help='Name of the member to search for')
-def search_members_by_name(name):
+def find_member_by_name(name):
     """Search for a member by name."""
     member = session.query(Member).filter(Member.name == name).first()
 
     if member:
-        click.echo(f"{member}")
+        click.echo(f"{member}\n")
     else:
         click.echo(error(f"No member found with the name: {name} \n"))
+
+# search routes
+@click.command()
+@click.option('--name', prompt='Name', help='Name of the route to search for')
+def find_route_by_name(name):
+    """Search for a route by name."""
+    route = session.query(Route).filter(Route.name == name).first()
+
+    if route:
+        click.echo(f"{route}\n")
+    else:
+        click.echo(error(f"No route found with the name: {name} \n"))
+
 
 
 # Add commands to the group
 my_commands.add_command(add_member)
 my_commands.add_command(add_route)
 my_commands.add_command(add_matatu)
-my_commands.add_command(search_members_by_name)
+my_commands.add_command(find_member_by_name)
+my_commands.add_command(find_route_by_name)
+
 
 
 
