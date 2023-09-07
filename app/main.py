@@ -56,9 +56,24 @@ def validate_location(ctx, param, value):
     
     return value
 
+def validate_route(ctx, param, value):
+    pattern = r'^[A-Za-z]+-[A-Za-z]+$'
+    if not re.match(pattern, value):
+        raise click.BadParameter(error('Invalid route. e.g., NRB-Juja'))
+    
+    return value
+
+def validate_price(ctx, param, value):
+    pattern = r'^[1-9][0-9]*[05]$'
+
+    if not re.match(pattern, value):
+        raise click.BadParameter(error('Invalid price.'))
+    
+    return value
 
 # LOGIC
 
+# Add a new member to the database.
 @click.command()
 @click.option('--name', prompt='Name', help="Member's full name", callback=validate_name)
 @click.option('--national_id', prompt='National ID', help='National ID', callback=validate_id)
@@ -73,10 +88,26 @@ def add_member(name, national_id, location, phone):
 
     click.echo(f"Added member with ID: {new_member.id}")
 
+# add
+
+@click.command()
+@click.option('--name', prompt='Name', help="Route name", callback=validate_route)
+@click.option('--price', prompt='Price', help="Route price", callback=validate_price)
+def add_route(name, price):
+    """Add a new route to the database."""
+    new_route = Route(name=name, price=price)
+
+    session.add(new_route)
+    session.commit()
+
+    click.echo(f"Added member with ID: {new_route.id}")
 
 
-# add commands to the group
+
+# Add commands to the group
 my_commands.add_command(add_member)
+my_commands.add_command(add_route)
+
 
 
 if __name__ == '__main__':
