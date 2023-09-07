@@ -3,6 +3,7 @@ from models import Member, Route, Matatu
 from colorama import init, Fore, Style
 import click
 import re
+import csv
 
 init()
 
@@ -138,7 +139,12 @@ def matatu_id_exists(ctx, param, value):
     if not id:
         raise click.BadParameter(error('id does not exist.'))
     
-    return value 
+    return value
+
+# def create_files(file_name, content):
+#     with open(file_name, 'w', encoding='utf-8') as new:
+#         new.write(content)
+
 
 # LOGIC
 
@@ -297,18 +303,76 @@ def owner_of_matatu(number_plate):
     else:
         click.echo(error(f"No matatu found with number plate: {number_plate} \n"))
 
+'''
+# Generates a text file
 @click.command()
 @click.option('--route_id', prompt='Route Id', help='Id of the route to search.', callback=route_id_exists)
+@click.argument('filename', type=click.Path(exists=False), required=0)
 def matatus_on_route(route_id):
     """Find all matatus plying this route."""
 
     if route_id:
-        all_matatus = session.query(Matatu).filter(Matatu.route_id == route_id).all()
 
-        click.echo(f"{all_matatus}\n")
+        all_matatus = session.query(Matatu).filter(Matatu.route_id == route_id).all()
+        filename = matatus_on_route if matatus_on_route is not None else "matatus_on_route.txt"
+        with open(filename, "+a") as file:
+            for matatu in all_matatus:
+                file.write (f'id : {matatu.id}, ' + \
+                            f'Driver Name : {matatu.driver_name}, ' + \
+                            f'Driver Contact : +{matatu.driver_contact}, ' + \
+                            f'Number Plate : {matatu.number_plate}, ' + \
+                            f'Capacity : {matatu.capacity}, ' + \
+                            f'Average Rounds Per Day : {matatu.avg_rounds_pd}, ' + \
+                            f'Owner : {session.query(Member.name).filter(Member.id == matatu.member_id).first()} \n'
+                           )
+        
+        
+        click.echo(green(f"File successfully creates. \n"))
+    
+        # all_matatus = session.query(Matatu).filter(Matatu.route_id == route_id).all()
+
+        # click.echo(f"{all_matatus}\n")
     else:
         click.echo(error(f"Route id not found. \n"))
+'''
 
+# Generates a CSV file
+
+@click.command()
+@click.option('--route_id', prompt='Route Id', help='Id of the route to search.', callback=route_id_exists)
+@click.option('--filename', prompt='Output Filename', help='Name of the output .csv file.')
+def matatus_on_route(route_id, filename):
+    """Find all matatus plying this route."""
+    
+    if route_id:
+        all_matatus = session.query(Matatu).filter(Matatu.route_id == route_id).all()
+                
+        if filename.endswith('.csv'):
+            file_name = filename
+        else:
+            file_name = f"{filename}.csv"
+
+        with open(file_name, "w", newline='') as csvfile:
+            fieldnames = ['id', 'Driver Name', 'Driver Contact', 'Number Plate', 'Capacity', 'Average Rounds Per Day', 'Owner']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            
+            writer.writeheader()
+            
+            for matatu in all_matatus:
+                owner_name_tuple = session.query(Member.name).filter(Member.id == matatu.member_id).first()
+                owner_name = owner_name_tuple[0] if owner_name_tuple else ""
+                writer.writerow({'id': matatu.id,
+                                 'Driver Name': matatu.driver_name,
+                                 'Driver Contact': f"+{matatu.driver_contact}",
+                                 'Number Plate': matatu.number_plate,
+                                 'Capacity': matatu.capacity,
+                                 'Average Rounds Per Day': matatu.avg_rounds_pd,
+                                 'Owner': owner_name
+                                })
+
+        click.echo(green(f"CSV file successfully created as: {filename}\n"))
+    else:
+        click.echo(error("Route id not found.\n"))
 
 
 # Add commands to the group
