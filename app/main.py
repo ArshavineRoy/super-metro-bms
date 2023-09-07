@@ -147,11 +147,25 @@ def add_matatu(driver_name, driver_contact, number_plate, capacity, avg_rounds_p
 
     click.echo(f"Added matatu with ID: {new_matatu.id}")
 
+# search members
+@click.command()
+@click.option('--name', prompt='Name', help='Name of the member to search for')
+def search_members_by_name(name):
+    """Search for a member by name."""
+    member = session.query(Member).filter(Member.name == name).first()
+
+    if member:
+        click.echo(f"{member}")
+    else:
+        click.echo(error(f"No member found with the name: {name} \n"))
+
 
 # Add commands to the group
 my_commands.add_command(add_member)
 my_commands.add_command(add_route)
 my_commands.add_command(add_matatu)
+my_commands.add_command(search_members_by_name)
+
 
 
 
