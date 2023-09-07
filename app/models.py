@@ -22,11 +22,11 @@ class Member(Base):
 
     def __repr__(self):
 
-        return f'Member(id={self.id}, ' + \
-            f'name={self.name}, ' + \
-            f'national_id={self.national_id}, ' + \
-            f'location={self.location}, ' + \
-            f'contact={self.phone})'
+        return f'Member(id = {self.id}, ' + \
+            f'name = {self.name}, ' + \
+            f'national_id = {self.national_id}, ' + \
+            f'location = {self.location}, ' + \
+            f'contact = +{self.phone})'
     
 
 class Route(Base):
@@ -44,9 +44,9 @@ class Route(Base):
                                   creator=lambda mem: Matatu(member=mem))
     
     def __repr__(self):
-        return f'Route(id={self.id}, ' + \
-            f'name={self.name}, ' + \
-            f'price={self.price})'
+        return f'Route(id = {self.id}, ' + \
+            f'name = {self.name}, ' + \
+            f'price = {self.price})'
     
 
 
@@ -72,11 +72,11 @@ class Matatu(Base):
     _member = relationship('Member', back_populates='matatus')
 
     def __repr__(self):
-        return f'Matatu(id={self.id}, ' + \
-            f'driver_name={self.driver_name}, ' + \
-            f'driver_contact={self.driver_contact}, ' + \
-            f'number_plate={self.number_plate}, ' + \
-            f'capacity={self.capacity}, ' + \
-            f'avg_rounds_pd={self.avg_rounds_pd}, ' + \
-            f'member_id={self.member_id}, ' + \
-            f'route_id={self.route_id})'
+        return f'Matatu(id = {self.id}, ' + \
+            f'driver_name = {self.driver_name}, ' + \
+            f'driver_contact = +{self.driver_contact}, ' + \
+            f'number_plate = {self.number_plate}, ' + \
+            f'capacity = {self.capacity}, ' + \
+            f'avg_rounds_pd = {self.avg_rounds_pd}, ' + \
+            f'member_id = {self.member_id}, ' + \
+            f'route_id = {self.route_id})'
