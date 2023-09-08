@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from db import Base, engine, session
 from models import Member, Route, Matatu
 from colorama import init, Fore, Style
@@ -141,10 +142,6 @@ def matatu_id_exists(ctx, param, value):
     
     return value
 
-# def create_files(file_name, content):
-#     with open(file_name, 'w', encoding='utf-8') as new:
-#         new.write(content)
-
 
 # LOGIC
 
@@ -165,7 +162,6 @@ def add_member(name, national_id, location, phone):
 
 
 # Add a new route to the database.
-
 @click.command()
 @click.option('--name', prompt='Name', help="Route name", callback=validate_route)
 @click.option('--price', prompt='Price', help="Route price", callback=validate_price)
@@ -255,7 +251,6 @@ def find_matatu_by_driver_name(driver_name):
         click.echo(error(f"No matatu found with driver name: {driver_name} \n"))
 
 # delete member 
-
 @click.command()
 @click.option('--id', prompt='Member Id', help='Id of the member to delete. This is not the national id.', callback=member_id_exists)
 def delete_member(id):
@@ -303,38 +298,6 @@ def owner_of_matatu(number_plate):
     else:
         click.echo(error(f"No matatu found with number plate: {number_plate} \n"))
 
-'''
-# Generates a text file
-@click.command()
-@click.option('--route_id', prompt='Route Id', help='Id of the route to search.', callback=route_id_exists)
-@click.argument('filename', type=click.Path(exists=False), required=0)
-def matatus_on_route(route_id):
-    """Find all matatus plying this route."""
-
-    if route_id:
-
-        all_matatus = session.query(Matatu).filter(Matatu.route_id == route_id).all()
-        filename = matatus_on_route if matatus_on_route is not None else "matatus_on_route.txt"
-        with open(filename, "+a") as file:
-            for matatu in all_matatus:
-                file.write (f'id : {matatu.id}, ' + \
-                            f'Driver Name : {matatu.driver_name}, ' + \
-                            f'Driver Contact : +{matatu.driver_contact}, ' + \
-                            f'Number Plate : {matatu.number_plate}, ' + \
-                            f'Capacity : {matatu.capacity}, ' + \
-                            f'Average Rounds Per Day : {matatu.avg_rounds_pd}, ' + \
-                            f'Owner : {session.query(Member.name).filter(Member.id == matatu.member_id).first()} \n'
-                           )
-        
-        
-        click.echo(green(f"File successfully creates. \n"))
-    
-        # all_matatus = session.query(Matatu).filter(Matatu.route_id == route_id).all()
-
-        # click.echo(f"{all_matatus}\n")
-    else:
-        click.echo(error(f"Route id not found. \n"))
-'''
 
 # Generates a CSV file with all matatus plying a certain route
 
@@ -370,7 +333,7 @@ def matatus_on_route(route_id, filename):
                                  'Owner': owner_name
                                 })
 
-        click.echo(green(f"CSV file successfully created as: {filename}\n"))
+        click.echo(green(f"CSV file successfully created as: {file_name}\n"))
     else:
         click.echo(error("Route id not found.\n"))
 
@@ -390,6 +353,55 @@ def matatus_owned_by(name):
         click.echo(error(f"No matatus found for {name} \n"))
 
 
+# Generates a CSV file with estimated monthly gross amounts for all matatus
+
+@click.command()
+@click.option('--filename', prompt='Output Filename', help='Name of the output .csv file.')
+def all_matatu_financials(filename):
+    """Est monthly gross amts for all matatus (.csv)"""
+
+    if filename.endswith('.csv'):
+        file_name = filename
+    else:
+        file_name = f"{filename}.csv"
+
+    with open(file_name, 'w', newline='') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow([
+            'Matatu ID', 
+            'Number Plate', 
+            'Route', 
+            'Capacity',
+            'Price Per Customer',
+            'Avg. Trips Pd', 
+            'Owned By', 
+            'Gross Amount'
+        ])
+
+        matatus = session.query(Matatu).all()
+
+        for matatu in matatus:
+            route_price = session.query(Route.price).filter(Route.id == matatu.route_id).first()
+            price_per_customer = route_price[0] if route_price else ""
+            route_name_tuple = session.query(Route.name).filter(Route.id == matatu.route_id).first()
+            route_name = route_name_tuple[0] if route_name_tuple else ""
+            owner_name_tuple = session.query(Member.name).filter(Member.id == matatu.member_id).first()
+            owner_name = owner_name_tuple[0] if owner_name_tuple else ""
+            gross_amount = matatu.capacity * route_price[0] * matatu.avg_rounds_pd * 30
+            csv_writer.writerow([
+                matatu.id, 
+                matatu.number_plate, 
+                route_name, 
+                matatu.capacity,
+                f'{price_per_customer:,}', 
+                matatu.avg_rounds_pd, 
+                owner_name, 
+                f'{gross_amount:,}',
+            ])
+
+    click.echo(green(f"CSV file successfully created as: {file_name}\n"))
+    
+
 
 # Add commands to the group
 my_commands.add_command(add_member)
@@ -405,6 +417,8 @@ my_commands.add_command(delete_matatu)
 my_commands.add_command(owner_of_matatu)
 my_commands.add_command(matatus_on_route)
 my_commands.add_command(matatus_owned_by)
+my_commands.add_command(all_matatu_financials)
+
 
 
 if __name__ == '__main__':
